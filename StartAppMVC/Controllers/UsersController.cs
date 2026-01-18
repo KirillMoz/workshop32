@@ -11,9 +11,9 @@ namespace StartAppMVC.Controllers
     public class UsersController: Controller
     {
         private readonly IBlogRepository _repo;
-        private readonly IRequestLogRepository _log;
+        private readonly IRequestRepository _log;
 
-        public UsersController(IBlogRepository repo, IRequestLogRepository log)
+        public UsersController(IBlogRepository repo, IRequestRepository log)
         {
             _repo = repo;
             _log = log;

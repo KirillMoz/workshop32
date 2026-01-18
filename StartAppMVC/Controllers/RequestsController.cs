@@ -8,17 +8,17 @@ namespace StartAppMVC.Controllers
     public class RequestsController : Controller
     {
         // GET: RequestsController
-        private readonly IBlogRepository _repo;
+        private readonly IRequestRepository _repo;
 
-        public RequestsController(IBlogRepository repo, IRequestLogRepository logrepo)
+        public RequestsController(IRequestRepository repo)
         {
             _repo = repo;
         }
 
         public async Task<IActionResult> Index()
         {
-            var request = await _repo.ge
-            return View(authors);
+            var request = await _repo.GetRequest();
+            return View(request);
         }
     }
 }

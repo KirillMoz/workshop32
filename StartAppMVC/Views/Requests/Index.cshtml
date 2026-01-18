@@ -1,47 +1,119 @@
-﻿@{
-    ViewData["Title"] = "View project request";
+﻿@model StartAppMVC.Models.Db.Request[]
+@{
+    ViewData["Title"] = "История запросов";
 }
 
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-center">📊 История всех запросов к приложению</h2>
+            <p class="text-center text-muted">
+                Всего запросов: <span class="badge bg-primary">@Model.Length</span>
+            </p>
+        </div>
+    </div>
+
+    @if (Model.Length == 0)
+    {
+        <div class="alert alert-info text-center">
+            <h4>📭 Запросов пока нет</h4>
+            <p>Как только кто-то зайдет на сайт, здесь появятся записи</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 5%">#</th>
+                        <th style="width: 20%">Дата и время</th>
+                        <th style="width: 75%">URL запроса</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Length; i++)
+                    {
+                        var request = Model[i];
+                        var requestNumber = i + 1;
+
+                        <tr>
+                            <td class="text-center fw-bold">@requestNumber</td>
+                            <td>
+                                <span class="text-muted small">@request.Date.ToString("dd.MM.yyyy")</span><br />
+                                <span class="fw-bold">@request.Date.ToString("HH:mm:ss")</span>
+                            </td>
+                            <td>
+                                @{
+                                    var url = request.Url;
+                                    var isGet = url.StartsWith("GET");
+                                    var isPost = url.StartsWith("POST");
+                                }
+
+                                <div class="d-flex align-items-center">
+                                    @if (isGet)
+                                    {
+                                        <span class="badge bg-success me-2">GET</span>
+                                    }
+                                    else if (isPost)
+                                    {
+                                        <span class="badge bg-primary me-2">POST</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary me-2">@url.Split(' ')[0]</span>
+                                    }
+
+                                    <code class="text-break">@url.Substring(url.IndexOf(' ') + 1)</code>
+                                </div>
+
+                                @if (url.Contains("localhost:5001"))
+                                {
+                                    <small class="text-muted mt-1 d-block">
+                                        <i class="bi bi-link-45deg"></i>
+                                        <a href="@url.Substring(url.IndexOf(' ') + 1)" target="_blank" class="text-decoration-none">
+                                            Открыть в новой вкладке
+                                        </a>
+                                    </small>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col">
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-info-circle"></i> Информация:</h6>
+                    <ul class="mb-0">
+                        <li>Записи отсортированы от новых к старым</li>
+                        <li>Каждый запрос имеет уникальный идентификатор (GUID)</li>
+                        <li>Логируются ВСЕ запросы к приложению через LoggingMiddleware</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
 <style>
-    table {
-        border-spacing: 0 15px;
-        align-self: center;
+    .table th {
+        position: sticky;
+        top: 0;
+        background-color: #343a40;
     }
 
-    th {
-        background-color: #4287f5;
-        color: white;
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+        transition: background-color 0.2s;
     }
 
-    th,
-    td {
-        width: 150px;
-        text-align: center;
-        border: 1px solid black;
-        padding: 5px;
-    }
-
-    h2 {
-        color: #4287f5;
+    code {
+        font-size: 0.9em;
+        background-color: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 4px;
     }
 </style>
-
-<div class="text-center">
-    <h2 class="display-4" style="text-align: left">Логи проекта</h2>
-    <br>
-    <table>
-        <tr>
-            <td>Идентификатор</td>
-            <td>Имя</td>
-            <td>Дата регистрации</td>
-        </tr>
-        @foreach (var request in Model)
-        {
-            <tr>
-                <td>@request.Id</td>
-                <td>@request.Date</td>
-                <td>@request.Url</td>
-            </tr>
-        }
-    </table>
-</div>

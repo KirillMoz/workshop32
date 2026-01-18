@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StartAppMVC.Models.Db
 {
-    public class BlogRepository : IBlogRepository, IRequestLogRepository
+    public class BlogRepository : IBlogRepository, IRequestRepository
     {
         private readonly BlogContext _context;
 

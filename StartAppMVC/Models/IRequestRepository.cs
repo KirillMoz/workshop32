@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace StartAppMVC.Models
 {
-    public interface IRequestLogRepository
+    public interface IRequestRepository
     {
         Task AddRequest(Request request);
         Task<Request[]> GetRequest();

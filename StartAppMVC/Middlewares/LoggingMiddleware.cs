@@ -8,37 +8,54 @@ namespace StartAppMVC.Middlewares
 {
     public class LoggingMiddleware
     {
-        private readonly RequestDelegate _next;
+        
+            private readonly RequestDelegate _next;
 
-        /// <summary>
-        ///  Middleware-компонент должен иметь конструктор, принимающий RequestDelegate
-        /// </summary>
-        public LoggingMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        /// <summary>
-        ///  Необходимо реализовать метод Invoke  или InvokeAsync
-        /// </summary>
-        public async Task InvokeAsync(HttpContext context, IRequestLogRepository repository)
-        {
-            // Создаем объект запроса
-            var request = new Request
+            public LoggingMiddleware(RequestDelegate next)
             {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now,
-                Url = $"http://{context.Request.Host.Value + context.Request.Path}"
-            };
+                _next = next;
+            }
 
-            // Логируем в консоль
-            Console.WriteLine($"[{request.Date}]: New request to {request.Url}");
+            public async Task InvokeAsync(HttpContext context, IRequestRepository repository)
+            {
+                try
+                {
+                    // Создаем объект запроса
+                    var requestLog = new Request
+                    {
+                        Id = Guid.NewGuid(),
+                        Date = DateTime.Now,
+                        Url = FormatRequestUrl(context.Request)
+                    };
 
-            // Сохраняем в базу данных
-            await repository.AddRequest(request);
+                    // Логируем в консоль для отладки
+                    Console.WriteLine($"[{requestLog.Date:yyyy-MM-dd HH:mm:ss}] {requestLog.Url}");
 
-            // Передача запроса далее по конвейеру
-            await _next.Invoke(context);
-        }
+                    // Сохраняем в базу данных
+                    await repository.AddRequest(requestLog);
+                }
+                catch (Exception ex)
+                {
+                    // Логируем ошибку, но не прерываем выполнение
+                    Console.WriteLine($"Ошибка при логировании запроса: {ex.Message}");
+                }
+
+                // Передача запроса далее по конвейеру
+                await _next.Invoke(context);
+            }
+
+            private string FormatRequestUrl(HttpRequest request)
+            {
+                // Форматируем URL: Метод + Хост + Путь + QueryString
+                var url = $"{request.Method} {request.Scheme}://{request.Host}{request.Path}";
+
+                if (!string.IsNullOrEmpty(request.QueryString.Value))
+                {
+                    url += request.QueryString.Value;
+                }
+
+                return url;
+            }
+        
     }
 }
