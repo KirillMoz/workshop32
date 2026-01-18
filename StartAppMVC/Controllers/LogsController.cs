@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace StartAppMVC.Controllers
 {
-    public class RequestsController : Controller
+    public class LogsController : Controller
     {
         // GET: RequestsController
         private readonly IRequestRepository _repo;
 
-        public RequestsController(IRequestRepository repo)
+        public LogsController(IRequestRepository repo)
         {
             _repo = repo;
         }
